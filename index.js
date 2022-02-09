@@ -12,7 +12,7 @@ app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 
 // Routes
-app.use(require('./routes/index'))
+app.use(require('./src/routes/index'))
 app.use(express.static('public'));
 
 //Empezando el servidor

@@ -1,8 +1,7 @@
-const { Router, response } = require('express');
+const { Router } = require('express');
 const router = Router();
 const pupppeteer = require('puppeteer')
 const fs = require('fs');
-const AWS = require('aws-sdk');
 
 
 var dir = './public/images';
