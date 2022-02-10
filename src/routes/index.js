@@ -4,7 +4,9 @@ const pupppeteer = require('puppeteer')
 const fs = require('fs');
 
 
-var dir = './public/images';
+const dir = './public/images';
+const public_path = 'http://localhost:3000/images/';
+
 
 
 const generarId = () => {
@@ -15,42 +17,49 @@ const generarId = () => {
 }
 
 async function run(url){
-    const browser = await pupppeteer.launch({
-        "dumpio": true,
-        "headless": true,
-        "executablePath": '/usr/bin/chromium-browser',
-        "args": [
-            '--disable-setuid-sandbox',
-            '--no-sandbox',
-            '--disable-gpu',
-        ]
-    })
-    const page = await browser.newPage()
-    await page.goto(url)
-    if (!fs.existsSync(dir)){
-        fs.mkdirSync(dir, { recursive: true });
+    let response;
+    try {
+        const browser = await pupppeteer.launch({
+            "args": [
+                '--disable-setuid-sandbox',
+                '--no-sandbox'
+            ]
+        })
+        const page = await browser.newPage()
+        await page.goto(url)
+        if (!fs.existsSync(dir)){
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        const capture_name = `${generarId()}.png`;
+        const screenshot_name = capture_name
+        const path = `${dir}/${screenshot_name}`
+        await page.screenshot({
+            path: path,
+            fullPage: true
+        })
+        const full_path = public_path + screenshot_name;
+        await browser.close()
+        response = {
+            'response' : 'success',
+            'msg': 'Captura obtenida correctamente',
+            'url': `${full_path}`
+        }
+    } catch (error) {
+        response = {
+            'response': 'error',
+            'msg': 'Lo sentimos, hubo un error al obtener la captura',
+            'error': error.originalMessage
+        };
     }
-    const screenshot_name = `${generarId()}.png`
-    console.log(screenshot_name)
-    const response = screenshot_name
-    await page.screenshot({
-        path: `${dir}/${screenshot_name}`,
-        fullPage: true
-    })
-    await browser.close()
 
-    return `http://localhost:3000/images/${screenshot_name}`;
+    return response;
 }
 
 router.get('/screenshot', async (req, res) => {
     const url = req.query.url;
     console.log(run(url))
     const response = await run(url);
-    res.json({
-        'response': 'success',
-        'msg': 'Captura obtenida correctamente',
-        'url': response,
-    })
+    res.json(response)
 })
 
 
