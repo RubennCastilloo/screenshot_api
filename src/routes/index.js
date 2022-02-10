@@ -15,7 +15,16 @@ const generarId = () => {
 }
 
 async function run(url){
-    const browser = await pupppeteer.launch()
+    const browser = await pupppeteer.launch({
+        "dumpio": true,
+        "headless": true,
+        "executablePath": '/usr/bin/chromium-browser',
+        "args": [
+            '--disable-setuid-sandbox',
+            '--no-sandbox',
+            '--disable-gpu',
+        ]
+    })
     const page = await browser.newPage()
     await page.goto(url)
     if (!fs.existsSync(dir)){
