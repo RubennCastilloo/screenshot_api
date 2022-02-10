@@ -62,5 +62,24 @@ router.get('/screenshot', async (req, res) => {
     res.json(response)
 })
 
+router.get('/delete_screenshots/:password', (req, res) => {
+    const password = req.params.password;
+
+    if(password === ''){
+        fs.rmdir(dir, { recursive: true }, (err) => {
+            if (err) {
+                throw err;
+            }
+        
+            console.log(`${dir} is deleted!`);
+            res.json({
+                'reponse': 'success',
+                'msg': 'Todas las capturas se han eliminado correctamente'
+            })
+        });
+    }
+    
+})
+
 
 module.exports = router;
